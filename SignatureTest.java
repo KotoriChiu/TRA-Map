@@ -17,11 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-
 import org.json.*;
 
 //java -Dfile.encoding=utf-8  SignatureTest
@@ -41,16 +38,13 @@ public class SignatureTest {
 			  } catch(Exception e) {
 				  System.out.println("error: "+e.getMessage());
 				  e.printStackTrace();
-			  }
-		   		  
+			  }  		  
 	}
 	
 	public static void start_readAPI(){
 		HttpURLConnection connection=null;
 		String APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
-	    
         String APPID = "a7356e8dce5c579171a1de694a034562";
-        
         String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
 
         System.setProperty("file.encoding", "UTF-8");
@@ -60,10 +54,8 @@ public class SignatureTest {
         
         String Signature="";
 		try {
-			
 			Signature = HMAC_SHA1.Signature(SignDate, APPKey);
 		} catch (SignatureException e1) {
-			
 			e1.printStackTrace();
 		}
 		
@@ -92,11 +84,7 @@ public class SignatureTest {
 		      GZIPInputStream gzis = new GZIPInputStream(bais);
 		      InputStreamReader reader = new InputStreamReader(gzis);
 		      BufferedReader in = new BufferedReader(reader);
-		      
-		      
-		      while ((line = in.readLine()) != null) {
-		          response+=(line+"\n");
-		      }
+		      while ((line = in.readLine()) != null) response+=(line+"\n");
 		      
 		      Type RailStationListType = new TypeToken<ArrayList<RailStation>>(){}.getType();
 		      Gson gsonReceiver = new Gson();
@@ -104,7 +92,6 @@ public class SignatureTest {
 			}catch(ProtocolException e){
 				e.printStackTrace();
 			}
-			
 			catch(Exception e){
 				e.printStackTrace();
 			}
@@ -122,7 +109,7 @@ public class SignatureTest {
 		    	System.out.println(data_Unfinished[a] + "\n");
 				fw.write(data_Unfinished[a] + "\n");
 			}
-				fw.flush();
+				fw.flush(); 
 				fw.close();
 				System.out.println("共抓到"+j.length()+"筆資料");
 		}catch(Exception e){
@@ -147,7 +134,6 @@ public class SignatureTest {
 				Object direction = jj.get("Direction"); //抓取順逆行資料
 				if(direction.toString().equals("0"))along_tmp++;
 				else inverse_tmp++;
-
 			}	
 			String[] station_name = new String[station]; //建立存取當前所有出現在動態上的車站數陣列
 			String[] along = new String[along_tmp];	   //建立順行總筆數陣列
