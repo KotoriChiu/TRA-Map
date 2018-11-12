@@ -28,6 +28,7 @@ import org.json.*;
 public class SignatureTest {
 	static String[] data_Unfinished;
 	static JSONArray j;
+	static JSONArray station_data;
 	static String line, response="";
 	public static void main(String[] args) {
 			  start_readAPI(); //取得API資料
@@ -168,6 +169,15 @@ public class SignatureTest {
 		}
 	}
 	
+	public static void liveboard_data(){
+		File[] file = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
+		try{
+			//讀取各個txt 尚未完成
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public static String getServerTime() {
 	    Calendar calendar = Calendar.getInstance();
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(
