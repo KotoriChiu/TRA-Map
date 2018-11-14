@@ -171,13 +171,27 @@ public class SignatureTest {
 	}
 	
 	public static void liveboard_data(){
-		FileReader[] file = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
-		
+		FileReader file_0 = new FileReader("./Station_Data/南北回主線.txt");
+		FileReader file_1 = new FileReader("./Station_Data/宜蘭支線.txt");
+		FileReader file_2 = new FileReader("./Station_Data/山線.txt");
+		FileReader file_3 = new FileReader("./Station_Data/成追線.txt");
+		FileReader file_4 = new FileReader("./Station_Data/沙崙支線.txt");
+		FileReader file_5 = new FileReader("./Station_Data/海線.txt");
+		FileReader file_6 = new FileReader("./Station_Data/深澳平溪線.txt");
+		FileReader file_7 = new FileReader("./Station_Data/縱貫線.txt");
+		String master = "",yeelan = "",mount = "",win = "",salan = "",sea = "",deep = "",longitudinal = "";
 		try{
 			//讀取各個txt 尚未完成
-			for(int a = 0;a<file.length();a++){
-				
-			}
+			BufferedReader br_0 = newBufferedReader(file_0);
+			BufferedReader br_1 = newBufferedReader(file_1);
+			BufferedReader br_2 = newBufferedReader(file_2);
+			BufferedReader br_3 = newBufferedReader(file_3);
+			BufferedReader br_4 = newBufferedReader(file_4);
+			BufferedReader br_5 = newBufferedReader(file_5);
+			BufferedReader br_6 = newBufferedReader(file_6);
+			BufferedReader br_7 = newBufferedReader(file_7);
+			while(br_0.ready) 
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
