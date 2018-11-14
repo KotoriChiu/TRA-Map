@@ -37,6 +37,7 @@ public class SignatureTest {
 			  try {
 				  start_arrange_dada();
 				  data_detail_process();
+				  liveboard_data();
 			  } catch(Exception e) {
 				  System.out.println("error: "+e.getMessage());
 				  e.printStackTrace();
@@ -171,26 +172,43 @@ public class SignatureTest {
 	}
 	
 	public static void liveboard_data(){
-		FileReader file_0 = new FileReader("./Station_Data/南北回主線.txt");
-		FileReader file_1 = new FileReader("./Station_Data/宜蘭支線.txt");
-		FileReader file_2 = new FileReader("./Station_Data/山線.txt");
-		FileReader file_3 = new FileReader("./Station_Data/成追線.txt");
-		FileReader file_4 = new FileReader("./Station_Data/沙崙支線.txt");
-		FileReader file_5 = new FileReader("./Station_Data/海線.txt");
-		FileReader file_6 = new FileReader("./Station_Data/深澳平溪線.txt");
-		FileReader file_7 = new FileReader("./Station_Data/縱貫線.txt");
+		
 		String master = "",yeelan = "",mount = "",win = "",salan = "",sea = "",deep = "",longitudinal = "";
 		try{
+			FileReader file_0 = new FileReader("./Station_Data/南北回主線.txt");
+			FileReader file_1 = new FileReader("./Station_Data/宜蘭支線.txt");
+			FileReader file_2 = new FileReader("./Station_Data/山線.txt");
+			FileReader file_3 = new FileReader("./Station_Data/成追線.txt");
+			FileReader file_4 = new FileReader("./Station_Data/沙崙支線.txt");
+			FileReader file_5 = new FileReader("./Station_Data/海線.txt");
+			FileReader file_6 = new FileReader("./Station_Data/深澳平溪線.txt");
+			FileReader file_7 = new FileReader("./Station_Data/縱貫線.txt");
 			//讀取各個txt 尚未完成
-			BufferedReader br_0 = newBufferedReader(file_0);
-			BufferedReader br_1 = newBufferedReader(file_1);
-			BufferedReader br_2 = newBufferedReader(file_2);
-			BufferedReader br_3 = newBufferedReader(file_3);
-			BufferedReader br_4 = newBufferedReader(file_4);
-			BufferedReader br_5 = newBufferedReader(file_5);
-			BufferedReader br_6 = newBufferedReader(file_6);
-			BufferedReader br_7 = newBufferedReader(file_7);
-			while(br_0.ready) 
+			BufferedReader br_0 = new BufferedReader(file_0);
+			BufferedReader br_1 = new BufferedReader(file_1);
+			BufferedReader br_2 = new BufferedReader(file_2);
+			BufferedReader br_3 = new BufferedReader(file_3);
+			BufferedReader br_4 = new BufferedReader(file_4);
+			BufferedReader br_5 = new BufferedReader(file_5);
+			BufferedReader br_6 = new BufferedReader(file_6);
+			BufferedReader br_7 = new BufferedReader(file_7);
+			while(br_0.ready())master+=br_0.readLine();
+			while(br_1.ready())yeelan+=br_1.readLine();
+			while(br_2.ready())mount+=br_2.readLine();
+			while(br_3.ready())win+=br_3.readLine();
+			while(br_4.ready())salan+=br_4.readLine();
+			while(br_5.ready())sea+=br_5.readLine();
+			while(br_6.ready())deep+=br_6.readLine();
+			while(br_7.ready())longitudinal+=br_7.readLine();
+			file_0.close();
+			file_1.close();
+			file_2.close();
+			file_3.close();
+			file_4.close();
+			file_5.close();
+			file_6.close();
+			file_7.close();
+			System.out.println(salan);
 			
 		}catch(Exception e){
 			e.printStackTrace();
