@@ -3,6 +3,7 @@ import java.io.ByteArrayInputStream;
 import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -170,9 +171,13 @@ public class SignatureTest {
 	}
 	
 	public static void liveboard_data(){
-		File[] file = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
+		FileReader[] file = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
+		
 		try{
 			//讀取各個txt 尚未完成
+			for(int a = 0;a<file.length();a++){
+				
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
