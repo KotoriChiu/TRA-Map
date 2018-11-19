@@ -173,6 +173,11 @@ public class SignatureTest {
 	
 	public static void liveboard_data(){
 		
+		JSONObject[] Station_DataJSON = new JSONObject[8];
+		Object[] jsonSD = new Object[8];
+		JSONArray[] SDA = new JSONArray[8];
+		String[][] SDS = new String[8][];
+		String[][] master_station_name = new String[8][172];
 		String[] master = {"","","","","","","",""};
 		try{
 			FileReader[] file = new FileReader[8];
@@ -183,8 +188,19 @@ public class SignatureTest {
 				br[a] =new BufferedReader(file[a]);
 				while(br[a].ready())master[a]+=br[a].readLine();
 				file[a].close();
+				SDA[a] = new JSONArray(master[a]);
+				SDS[a] = new String[SDA[a].length()];
+				for(int i = 0; i<SDA[a].length();i++)SDS[a][i] = String.valueOf(SDA[a].get(i));
+				for(int i = 0; i<SDA[a].length();i++){
+					Station_DataJSON[a] = new JSONObject(SDS[a][i]);
+					jsonSD[a] = Station_DataJSON[a].getJSONObject("StationName").get("Zh_tw");
+					master_station_name[a][i] = jsonSD[a].toString();
+				}
 			}
-			System.out.println(master[7]);
+			//
+
+
+			//System.out.println(master[7]);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
