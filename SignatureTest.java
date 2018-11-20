@@ -31,17 +31,20 @@ public class SignatureTest {
 	static JSONArray j;
 	static JSONArray station_data;
 	static String line, response="";
+	static String[][][] Train_time = new String[8][][];
 	public static void main(String[] args) {
-			  start_readAPI(); //取得API資料
-			  //System.out.println(response);
-			  try {
-				  start_arrange_dada();
-				  data_detail_process();
-				  liveboard_data();
-			  } catch(Exception e) {
-				  System.out.println("error: "+e.getMessage());
-				  e.printStackTrace();
-			  }  		  
+				long startTime = System.currentTimeMillis();
+			  	start_readAPI(); //取得API資料
+			  	//System.out.println(response);
+			  	try {
+				  	start_arrange_dada();
+				  	data_detail_process();
+					liveboard_data();
+					System.out.println("Using Time:" + (System.currentTimeMillis() - startTime) + " ms");
+			  	} catch(Exception e) {
+				  	System.out.println("error: "+e.getMessage());
+				  	e.printStackTrace();
+			  	}  		  
 	}
 	
 	public static void start_readAPI(){
@@ -190,22 +193,26 @@ public class SignatureTest {
 				file[a].close();
 				SDA[a] = new JSONArray(master[a]);
 				SDS[a] = new String[SDA[a].length()];
-				for(int i = 0; i<SDA[a].length();i++)SDS[a][i] = String.valueOf(SDA[a].get(i));
 				for(int i = 0; i<SDA[a].length();i++){
+					SDS[a][i] = String.valueOf(SDA[a].get(i));
 					Station_DataJSON[a] = new JSONObject(SDS[a][i]);
 					jsonSD[a] = Station_DataJSON[a].getJSONObject("StationName").get("Zh_tw");
 					master_station_name[a][i] = jsonSD[a].toString();
 				}
 			}
-			//
+			int[] Station_numbers = {0,0,0,0,0,0,0,0};
+			for(int i = 0;i < master_station_name.length;i++){
+				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
+				System.out.println(Station_numbers[i]);
+				Train_time[i] =new String[Station_numbers[i]][]; 
 
-
-			//System.out.println(master[7]);
+			}
+			
+			//System.out.println(master_station_name[0][1]);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-
 	public static String getServerTime() {
 	    Calendar calendar = Calendar.getInstance();
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(
