@@ -31,7 +31,8 @@ public class SignatureTest {
 	static JSONArray j;
 	static JSONArray station_data;
 	static String line, response="";
-	static String[][][] Train_time = new String[8][][];
+	static String[][][][] Train_time = new String[2][8][][];
+	static String[][] master_station_name = new String[8][172];
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
 			  	start_readAPI(); //取得API資料
@@ -180,7 +181,6 @@ public class SignatureTest {
 		Object[] jsonSD = new Object[8];
 		JSONArray[] SDA = new JSONArray[8];
 		String[][] SDS = new String[8][];
-		String[][] master_station_name = new String[8][172];
 		String[] master = {"","","","","","","",""};
 		try{
 			FileReader[] file = new FileReader[8];
@@ -204,15 +204,30 @@ public class SignatureTest {
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
 				System.out.println(Station_numbers[i]);
-				Train_time[i] =new String[Station_numbers[i]][]; 
-
+				Train_time[0][i] =new String[Station_numbers[i]][]; 
+				Train_time[1][i] =new String[Station_numbers[i]][]; 
 			}
-			
+			for(String[] i : master_station_name){
+				for(String j : i){
+					if(j != null)System.out.print(j+" ");
+					else break;
+				}
+				System.out.println();
+			}
 			//System.out.println(master_station_name[0][1]);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
+
+	public static void Straight_retrograde_processing(){
+		try{
+			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX]
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public static String getServerTime() {
 	    Calendar calendar = Calendar.getInstance();
 	    SimpleDateFormat dateFormat = new SimpleDateFormat(
