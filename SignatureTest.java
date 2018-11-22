@@ -221,8 +221,14 @@ public class SignatureTest {
 	}
 
 	public static void Straight_retrograde_processing(){
+		JSONObject data;
 		try{
 			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX]
+			for(int a = 0;a<data_Unfinished.length;a++){
+				data = new JSONObject(data_Unfinished[a]);
+				Object jsonStation = jj.getJSONObject("StationName").get("Zh_tw");
+				//Object json
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -237,6 +243,5 @@ public class SignatureTest {
 	}
 
 }
-
 
 
