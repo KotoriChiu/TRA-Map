@@ -3,6 +3,7 @@ import java.io.ByteArrayInputStream;
 import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -28,24 +29,39 @@ import org.json.*;
 public class SignatureTest {
 	static String[] data_Unfinished;
 	static JSONArray j;
+<<<<<<< HEAD
 	static String line, response= "";
+=======
+	static JSONArray station_data;
+	static String line, response="";
+	static String[][][][] Train_time = new String[2][8][][];
+	static String[][] master_station_name = new String[8][172];
+>>>>>>> 1d68efb24312537f3a192c0e7128ea39f6c3f93a
 	public static void main(String[] args) {
-			  start_readAPI(); //取得API資料
-			  //System.out.println(response);
-			  try {
-				  start_arrange_dada();
-				  data_detail_process();
-			  } catch(Exception e) {
-				  System.out.println("error: "+e.getMessage());
-				  e.printStackTrace();
-			  }  		  
+				long startTime = System.currentTimeMillis();
+			  	start_readAPI(); //取得API資料
+			  	//System.out.println(response);
+			  	try {
+				  	start_arrange_dada();
+				  	data_detail_process();
+					liveboard_data();
+					System.out.println("Using Time:" + (System.currentTimeMillis() - startTime) + " ms");
+			  	} catch(Exception e) {
+				  	System.out.println("error: "+e.getMessage());
+				  	e.printStackTrace();
+			  	}  		  
 	}
 	
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
+<<<<<<< HEAD
 		String APPID = "a7356e8dce5c579171a1de694a034562";
 		String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
+=======
+        String APPID = "71a1de694a034562a7356e8dce5c5791";
+        String APPKey = "Oexh2v7Rpof5X2B22xLpRuZIscs";
+>>>>>>> 1d68efb24312537f3a192c0e7128ea39f6c3f93a
 
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
@@ -166,6 +182,65 @@ public class SignatureTest {
 		}
 	}
 	
+	public static void liveboard_data(){
+		
+		JSONObject[] Station_DataJSON = new JSONObject[8];
+		Object[] jsonSD = new Object[8];
+		JSONArray[] SDA = new JSONArray[8];
+		String[][] SDS = new String[8][];
+		String[] master = {"","","","","","","",""};
+		try{
+			FileReader[] file = new FileReader[8];
+			String[] Station_txt = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
+			for(int a = 0;a<8;a++)file[a] = new FileReader(Station_txt[a]);
+			BufferedReader[] br= new BufferedReader[8];
+			for(int a = 0;a<8;a++){
+				br[a] =new BufferedReader(file[a]);
+				while(br[a].ready())master[a]+=br[a].readLine();
+				file[a].close();
+				SDA[a] = new JSONArray(master[a]);
+				SDS[a] = new String[SDA[a].length()];
+				for(int i = 0; i<SDA[a].length();i++){
+					SDS[a][i] = String.valueOf(SDA[a].get(i));
+					Station_DataJSON[a] = new JSONObject(SDS[a][i]);
+					jsonSD[a] = Station_DataJSON[a].getJSONObject("StationName").get("Zh_tw");
+					master_station_name[a][i] = jsonSD[a].toString();
+				}
+			}
+			int[] Station_numbers = {0,0,0,0,0,0,0,0};
+			for(int i = 0;i < master_station_name.length;i++){
+				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
+				System.out.println(Station_numbers[i]);
+				Train_time[0][i] =new String[Station_numbers[i]][]; 
+				Train_time[1][i] =new String[Station_numbers[i]][]; 
+			}
+			for(String[] i : master_station_name){
+				for(String j : i){
+					if(j != null)System.out.print(j+" ");
+					else break;
+				}
+				System.out.println();
+			}
+			//System.out.println(master_station_name[0][1]);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public static void Straight_retrograde_processing(){
+		JSONObject data;
+		try{
+			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX]
+			for(int a = 0;a<data_Unfinished.length;a++){
+				data = new JSONObject(data_Unfinished[a]);
+				Object jsonStation = jj.getJSONObject("StationName").get("Zh_tw");
+				//Object json
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public static String getServerTime() {
 	    Calendar calendar = Calendar.getInstance();
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
