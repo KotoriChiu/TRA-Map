@@ -21,14 +21,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.json.*;
 
-//java -Dfile.encoding=utf-8  SignatureTest
-//javac -encoding utf-8 SignatureTest.java
-
+// java -Dfile.encoding=utf-8  SignatureTest
+// javac -encoding utf-8 SignatureTest.java
+// javac -encoding utf-8 SignatureTest.java && java -Dfile.encoding=utf-8 SignatureTest
 
 public class SignatureTest {
 	static String[] data_Unfinished;
 	static JSONArray j;
-	static String line, response="";
+	static String line, response= "";
 	public static void main(String[] args) {
 			  start_readAPI(); //取得API資料
 			  //System.out.println(response);
@@ -41,16 +41,17 @@ public class SignatureTest {
 			  }  		  
 	}
 	
-	public static void start_readAPI(){
-		HttpURLConnection connection=null;
+	public static void start_readAPI() {
+		HttpURLConnection connection = null;
 		String APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
-        String APPID = "a7356e8dce5c579171a1de694a034562";
-        String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
+		//String APPID = "a7356e8dce5c579171a1de694a034562";
+		String APPID = "306cc4a072fa42788708a253cd0b1906";
+		//String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
+		String APPKey = "c2hV4i0bhTwcRXLuZMj4Ya2p9hc";
 
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
         String SignDate = "x-date: " + xdate;
-        
         
         String Signature="";
 		try {
@@ -79,7 +80,6 @@ public class SignatureTest {
 	          int bytesRead = 0;
 	          while((bytesRead = inputStream.read(buff)) != -1) bao.write(buff, 0, bytesRead);
 	          
-	          
 		      ByteArrayInputStream bais = new ByteArrayInputStream(bao.toByteArray());
 		      GZIPInputStream gzis = new GZIPInputStream(bais);
 		      InputStreamReader reader = new InputStreamReader(gzis);
@@ -92,12 +92,12 @@ public class SignatureTest {
 			}catch(ProtocolException e){
 				e.printStackTrace();
 			}
-			catch(Exception e){
+			catch(Exception e) {
 				e.printStackTrace();
 			}
 	}
 	
-	public static void start_arrange_dada(){
+	public static void start_arrange_dada() {
 		File file = new File("output.txt");
 		try{
 			j = new JSONArray(response);
@@ -111,48 +111,49 @@ public class SignatureTest {
 			}
 				fw.flush(); 
 				fw.close();
-				System.out.println("共抓到"+j.length()+"筆資料");
-		}catch(Exception e){
-			e.printStackTrace();	
+				System.out.println("共抓到" + j.length() + "筆資料");
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	public static void data_detail_process() {
 		JSONObject jj;
 		try{
-			String temp="",temp_2="";
-			int station = 1,station_tmp = 0;
-			int along_tmp = 0,inverse_tmp = 0; //順行計次,逆行計次
-			for(int a = 0; a < j.length() ; a++){
+			String temp = "", temp_2 = "";
+			int station = 1, station_tmp = 0;
+			int along_tmp = 0, inverse_tmp = 0; //順行計次,逆行計次
+			for(int a = 0; a < j.length() ; a++) {
 				jj = new JSONObject(data_Unfinished[a]); 
 
 				Object jsonOb = jj.getJSONObject("StationName").get("Zh_tw"); //抓取車站資料(測試用)
 				temp = jsonOb.toString();
-				if(a!=0 && !temp.equals(temp_2))station++; //計算過濾同車站多筆資料
+				if(a != 0 && !temp.equals(temp_2)) station++; //計算過濾同車站多筆資料
 				temp_2 = jsonOb.toString();
 
 				Object direction = jj.get("Direction"); //抓取順逆行資料
-				if(direction.toString().equals("0"))along_tmp++;
+				if(direction.toString().equals("0")) along_tmp++;
 				else inverse_tmp++;
 			}	
 			String[] station_name = new String[station]; //建立存取當前所有出現在動態上的車站數陣列
 			String[] along = new String[along_tmp];	   //建立順行總筆數陣列
 			String[] inverse = new String[inverse_tmp];  //建立逆行總筆數陣列
-			temp = "" ; temp_2 = ""; along_tmp = 0; inverse_tmp = 0; 
+			temp = "";
+			temp_2 = "";
+			along_tmp = 0;
+			inverse_tmp = 0; 
 
-			for(int a = 0; a < j.length() ; a++){
+			for(int a = 0; a < j.length(); a++) {
 				jj = new JSONObject(data_Unfinished[a]);
 				Object jsonob = jj.getJSONObject("StationName").get("Zh_tw"); 
-					  
 				temp = jsonob.toString();
-				if(a != 0 && !temp.equals(temp_2)){ //多筆同樣車站名的資料過濾成一個 存進陣列
+				if(a != 0 && !temp.equals(temp_2)) { //多筆同樣車站名的資料過濾成一個 存進陣列
 					station_name[station_tmp] = temp_2;
 					station_tmp++;
 				} 
 				temp_2 = jsonob.toString();
-
 				Object direcTion = jj.get("Direction"); //抓取資料的"Direction"參數(順逆行參數)
-				if(direcTion.toString().equals("0")){  //辨別資料是順行還逆行 分別存在順逆行的陣列
+				if(direcTion.toString().equals("0")) {  //辨別資料是順行還逆行 分別存在順逆行的陣列
 					along[along_tmp] = data_Unfinished[a];
 					along_tmp++;
 				}else {
@@ -160,10 +161,10 @@ public class SignatureTest {
 					inverse_tmp++;
 				}
 			}
-			station_name[station-1] = temp_2;
-			for(int a = 0;a < station;a++) System.out.print(station_name[a]+a+" ");
-			System.out.println("順行資料共有:"+along_tmp+"筆 逆行資料共有:"+inverse_tmp+"筆");
-		}catch(Exception e){
+			station_name[station - 1] = temp_2;
+			for(int a = 0; a < station; a++) System.out.print(station_name[a] + a + " ");
+			System.out.println("順行資料共有:" + along_tmp + "筆 逆行資料共有:" + inverse_tmp + "筆");
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -175,7 +176,4 @@ public class SignatureTest {
 	    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 	    return dateFormat.format(calendar.getTime());
 	}
-
 }
-
-
