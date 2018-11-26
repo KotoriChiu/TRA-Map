@@ -44,10 +44,8 @@ public class SignatureTest {
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
-		//String APPID = "a7356e8dce5c579171a1de694a034562";
-		String APPID = "306cc4a072fa42788708a253cd0b1906";
-		//String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
-		String APPKey = "c2hV4i0bhTwcRXLuZMj4Ya2p9hc";
+		String APPID = "a7356e8dce5c579171a1de694a034562";
+		String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
 
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
