@@ -75,14 +75,14 @@ public class SignatureTest {
 	          ByteArrayOutputStream bao = new ByteArrayOutputStream();
 		      byte[] buff = new byte[1024];
 	          int bytesRead = 0;
-	          while((bytesRead = inputStream.read(buff)) != -1) bao.write(buff, 0, bytesRead);
-	          
+			  while((bytesRead = inputStream.read(buff)) != -1) bao.write(buff, 0, bytesRead);
+			  
 		      ByteArrayInputStream bais = new ByteArrayInputStream(bao.toByteArray());
 		      GZIPInputStream gzis = new GZIPInputStream(bais);
 		      InputStreamReader reader = new InputStreamReader(gzis);
 		      BufferedReader in = new BufferedReader(reader);
-		      while ((line = in.readLine()) != null) response+=(line+"\n");
-		      
+			  while ((line = in.readLine()) != null) response+=(line+"\n");
+			  
 		      Type RailStationListType = new TypeToken<ArrayList<RailStation>>(){}.getType();
 		      Gson gsonReceiver = new Gson();
 		      List<RailStation> obj = gsonReceiver.fromJson(response, RailStationListType);
@@ -168,8 +168,7 @@ public class SignatureTest {
 	
 	public static String getServerTime() {
 	    Calendar calendar = Calendar.getInstance();
-	    SimpleDateFormat dateFormat = new SimpleDateFormat(
-	        "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+	    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
 	    dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 	    return dateFormat.format(calendar.getTime());
 	}
