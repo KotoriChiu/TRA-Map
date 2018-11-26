@@ -86,7 +86,7 @@ public class SignatureTest {
 		      Type RailStationListType = new TypeToken<ArrayList<RailStation>>(){}.getType();
 		      Gson gsonReceiver = new Gson();
 		      List<RailStation> obj = gsonReceiver.fromJson(response, RailStationListType);
-			}catch(ProtocolException e){
+			}catch(ProtocolException e) {
 				e.printStackTrace();
 			}
 			catch(Exception e) {
