@@ -49,8 +49,7 @@ public class SignatureTest {
 
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
-        String SignDate = "x-date: " + xdate;
-        
+        String SignDate = "x-date: " + xdate;        
         String Signature="";
 		try {
 			Signature = HMAC_SHA1.Signature(SignDate, APPKey);
