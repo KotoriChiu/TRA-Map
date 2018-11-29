@@ -22,21 +22,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.json.*;
 
-// java -Dfile.encoding=utf-8  SignatureTest
-// javac -encoding utf-8 SignatureTest.java
 // javac -encoding utf-8 SignatureTest.java && java -Dfile.encoding=utf-8 SignatureTest
 
 public class SignatureTest {
 	static String[] data_Unfinished;
 	static JSONArray j;
-<<<<<<< HEAD
-	static String line, response= "";
-=======
+	static JSONObject jj;
 	static JSONArray station_data;
 	static String line, response="";
 	static String[][][][] Train_time = new String[2][8][][];
 	static String[][] master_station_name = new String[8][172];
->>>>>>> 1d68efb24312537f3a192c0e7128ea39f6c3f93a
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
 			  	start_readAPI(); //取得API資料
@@ -54,30 +49,29 @@ public class SignatureTest {
 	
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
-		String APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
-<<<<<<< HEAD
-		String APPID = "a7356e8dce5c579171a1de694a034562";
-		String APPKey = "B22xLpRuZIscsOexh2v7Rpof5X2";
-=======
-        String APPID = "71a1de694a034562a7356e8dce5c5791";
-        String APPKey = "Oexh2v7Rpof5X2B22xLpRuZIscs";
->>>>>>> 1d68efb24312537f3a192c0e7128ea39f6c3f93a
+		String[] APP_Url_Id_Key = new String[3];      
 
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
         String SignDate = "x-date: " + xdate;        
         String Signature="";
 		try {
-			Signature = HMAC_SHA1.Signature(SignDate, APPKey);
+			FileReader fr = new FileReader("API_key");
+			BufferedReader API_key = new BufferedReader(fr); //更新寫法 用文字檔讀取Url ID Key
+			for(int i = 0;i<APP_Url_Id_Key.length;i++) APP_Url_Id_Key[i] = API_key.readLine();
+			fr.close();
+			Signature = HMAC_SHA1.Signature(SignDate, APP_Url_Id_Key[2]);
 		} catch (SignatureException e1) {
 			e1.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		
 		System.out.println("Signature :" + Signature);
-        String sAuth = "hmac username=\"" + APPID + "\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"" + Signature + "\"";
+        String sAuth = "hmac username=\"" + APP_Url_Id_Key[1] + "\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"" + Signature + "\"";
         System.out.println(sAuth);
 		   try{  
-		      URL url=new URL(APIUrl);
+		      URL url=new URL(APP_Url_Id_Key[0]);
 		      connection=(HttpURLConnection)url.openConnection();
 		      connection.setRequestMethod("GET");
 		      connection.setRequestProperty("Authorization", sAuth);
@@ -111,11 +105,10 @@ public class SignatureTest {
 	}
 	
 	public static void start_arrange_dada() {
-		File file = new File("output.txt");
 		try{
 			j = new JSONArray(response);
 			data_Unfinished = new String[j.length()];
-			FileWriter fw = new FileWriter(file);
+			FileWriter fw = new FileWriter("output");
 			
 			for (int a=0; a < j.length(); a++) { //整理JSON
 				data_Unfinished[a] = String.valueOf(j.get(a));
@@ -131,7 +124,6 @@ public class SignatureTest {
 	}
 
 	public static void data_detail_process() {
-		JSONObject jj;
 		try{
 			String temp = "", temp_2 = "";
 			int station = 1, station_tmp = 0;
@@ -191,7 +183,7 @@ public class SignatureTest {
 		String[] master = {"","","","","","","",""};
 		try{
 			FileReader[] file = new FileReader[8];
-			String[] Station_txt = {"./Station_Data/南北回主線.txt","./Station_Data/宜蘭支線.txt","./Station_Data/山線.txt","./Station_Data/成追線.txt","./Station_Data/沙崙支線.txt","./Station_Data/海線.txt","./Station_Data/深澳平溪線.txt","./Station_Data/縱貫線.txt"};
+			String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
 			for(int a = 0;a<8;a++)file[a] = new FileReader(Station_txt[a]);
 			BufferedReader[] br= new BufferedReader[8];
 			for(int a = 0;a<8;a++){
@@ -213,6 +205,7 @@ public class SignatureTest {
 				System.out.println(Station_numbers[i]);
 				Train_time[0][i] =new String[Station_numbers[i]][]; 
 				Train_time[1][i] =new String[Station_numbers[i]][]; 
+				//System.out.print(i+" ");
 			}
 			for(String[] i : master_station_name){
 				for(String j : i){
@@ -230,11 +223,11 @@ public class SignatureTest {
 	public static void Straight_retrograde_processing(){
 		JSONObject data;
 		try{
-			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX]
+			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX] X每條線的車站數 XX每個車站的資料數
 			for(int a = 0;a<data_Unfinished.length;a++){
 				data = new JSONObject(data_Unfinished[a]);
-				Object jsonStation = jj.getJSONObject("StationName").get("Zh_tw");
-				//Object json
+				Object jsonStation = data.getJSONObject("StationName").get("Zh_tw");
+				Object jsonFR = data.get("Direction"); //創兩個順逆行整數整數陣列 計算每個車站的順逆型資料有多少筆
 			}
 		}catch(Exception e){
 			e.printStackTrace();
