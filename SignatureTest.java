@@ -4,6 +4,9 @@ import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -50,12 +53,22 @@ public class SignatureTest {
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String[] APP_Url_Id_Key = new String[3];      
-
+		String[] txtdata = {"http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON","XXXXXXXXXXXXXXXXX  APPID","XXXXXXXXXXXXXXXXX  APPKey"};
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
         String SignDate = "x-date: " + xdate;        
-        String Signature="";
+		String Signature="";
+		File file = new File("API_key");
 		try {
+			
+			if(!file.exists()){ //判斷密鑰檔是否存在
+				FileWriter fw = new FileWriter("API_key");
+				for(int i = 0;i < 3;i++)fw.write(txtdata[i]+"\n"); //寫入預設密鑰檔內容
+				fw.flush();
+				fw.close();
+				System.out.println("文件檔\"API_key\"已新增,請至目錄下設定AppID AppKey!!!");
+				System.exit(0); //當密鑰文件檔未創立 自動創立完 且停止程式執行
+			}
 			FileReader fr = new FileReader("API_key");
 			BufferedReader API_key = new BufferedReader(fr); //更新寫法 用文字檔讀取Url ID Key
 			for(int i = 0;i<APP_Url_Id_Key.length;i++) APP_Url_Id_Key[i] = API_key.readLine();
@@ -67,9 +80,9 @@ public class SignatureTest {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Signature :" + Signature);
+		//System.out.println("Signature :" + Signature);
         String sAuth = "hmac username=\"" + APP_Url_Id_Key[1] + "\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"" + Signature + "\"";
-        System.out.println(sAuth);
+        //System.out.println(sAuth);
 		   try{  
 		      URL url=new URL(APP_Url_Id_Key[0]);
 		      connection=(HttpURLConnection)url.openConnection();
