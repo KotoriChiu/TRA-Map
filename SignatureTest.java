@@ -35,6 +35,8 @@ public class SignatureTest {
 	static String line, response="";
 	static String[][][][] Train_time = new String[2][8][][];
 	static String[][] master_station_name = new String[8][172];
+	static String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
+	static int[] Station_numbers = {0,0,0,0,0,0,0,0};
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
 			  	start_readAPI(); //取得API資料
@@ -196,7 +198,6 @@ public class SignatureTest {
 		String[] master = {"","","","","","","",""};
 		try{
 			FileReader[] file = new FileReader[8];
-			String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
 			for(int a = 0;a<8;a++)file[a] = new FileReader(Station_txt[a]);
 			BufferedReader[] br= new BufferedReader[8];
 			for(int a = 0;a<8;a++){
@@ -212,7 +213,7 @@ public class SignatureTest {
 					master_station_name[a][i] = jsonSD[a].toString();
 				}
 			}
-			int[] Station_numbers = {0,0,0,0,0,0,0,0};
+			
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
 				System.out.println(Station_numbers[i]);
@@ -235,12 +236,25 @@ public class SignatureTest {
 
 	public static void Straight_retrograde_processing(){
 		JSONObject data;
+		List<String>[][][][]listArray = new List<String>[2][8][][];
+		for(int i = 0;i<2;i++){
+			for(int j = 0;j<8;j++)listArray[i][j] = new List<String>[Station_numbers[j]][];
+		}
 		try{
-			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX] X每條線的車站數 XX每個車站的資料數
+			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX] X每條線的車站數 XX每個車站的資料數 0順 1逆
 			for(int a = 0;a<data_Unfinished.length;a++){
 				data = new JSONObject(data_Unfinished[a]);
 				Object jsonStation = data.getJSONObject("StationName").get("Zh_tw");
 				Object jsonFR = data.get("Direction"); //創兩個順逆行整數整數陣列 計算每個車站的順逆型資料有多少筆
+				for(int i = 0;i<Station_txt.length;){
+					FileReader fr = new FileReader(Station_txt[i]);
+					BufferedReader br = new BufferedReader(fr);
+					for(int j=0;br.ready();j++){
+						String value = br.readLine();
+						if(jsonStation.toString().equals(value) && jsonFR.toString().equals("0"));
+					}
+				}
+				
 			}
 		}catch(Exception e){
 			e.printStackTrace();
