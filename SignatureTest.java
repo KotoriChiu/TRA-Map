@@ -51,7 +51,7 @@ public class SignatureTest {
 				  	e.printStackTrace();
 			  	}  		  
 	}
-	
+	//讀取API
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String[] APP_Url_Id_Key = new String[3];      
@@ -118,7 +118,7 @@ public class SignatureTest {
 				e.printStackTrace();
 			}
 	}
-	
+	//處理抓到的資料
 	public static void start_arrange_dada() {
 		try{
 			j = new JSONArray(response);
@@ -236,7 +236,7 @@ public class SignatureTest {
 
 	public static void Straight_retrograde_processing(){
 		JSONObject data;
-		List<String>[][][][]listArray = new List<String>[2][8][][];
+		List<String>[][][][]listArray = new List<String>[2][8][][]; //172 2 21 2 3 16 11 3
 		for(int i = 0;i<2;i++){
 			for(int j = 0;j<8;j++)listArray[i][j] = new List<String>[Station_numbers[j]][];
 		}
