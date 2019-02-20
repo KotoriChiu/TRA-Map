@@ -235,30 +235,7 @@ public class SignatureTest {
 	}
 
 	public static void Straight_retrograde_processing(){
-		JSONObject data;
-		List<String>[][][][]listArray = new List<String>[2][8][][]; //172 2 21 2 3 16 11 3
-		for(int i = 0;i<2;i++){
-			for(int j = 0;j<8;j++)listArray[i][j] = new List<String>[Station_numbers[j]][];
-		}
-		try{
-			//這邊要做將四維陣列Train_time[2][8][X][XX] 的XX放入API抓下來的資料 並且順逆行分開放在Train_time[0][8][X][XX]跟Train_time[1][8][X][XX] X每條線的車站數 XX每個車站的資料數 0順 1逆
-			for(int a = 0;a<data_Unfinished.length;a++){
-				data = new JSONObject(data_Unfinished[a]);
-				Object jsonStation = data.getJSONObject("StationName").get("Zh_tw");
-				Object jsonFR = data.get("Direction"); //創兩個順逆行整數整數陣列 計算每個車站的順逆型資料有多少筆
-				for(int i = 0;i<Station_txt.length;){
-					FileReader fr = new FileReader(Station_txt[i]);
-					BufferedReader br = new BufferedReader(fr);
-					for(int j=0;br.ready();j++){
-						String value = br.readLine();
-						if(jsonStation.toString().equals(value) && jsonFR.toString().equals("0"));
-					}
-				}
-				
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		
 	}
 
 	public static String getServerTime() {
