@@ -17,6 +17,7 @@ import java.security.SignatureException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.IllegalFormatWidthException;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -37,6 +38,9 @@ public class SignatureTest {
 	static String[][] master_station_name = new String[8][172];
 	static String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
 	static int[] Station_numbers = {0,0,0,0,0,0,0,0};
+	static String[] along;
+	static String[] inverse;
+	static int along_tmp , inverse_tmp; 
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
 			  	start_readAPI(); //取得API資料
@@ -46,6 +50,7 @@ public class SignatureTest {
 				  	data_detail_process();
 					liveboard_data();
 					System.out.println("Using Time:" + (System.currentTimeMillis() - startTime) + " ms");
+					Straight_retrograde_processing();
 			  	} catch(Exception e) {
 				  	System.out.println("error: "+e.getMessage());
 				  	e.printStackTrace();
@@ -142,7 +147,8 @@ public class SignatureTest {
 		try{
 			String temp = "", temp_2 = "";
 			int station = 1, station_tmp = 0;
-			int along_tmp = 0, inverse_tmp = 0; //順行計次,逆行計次
+			along_tmp = 0;   //順行計次
+			inverse_tmp = 0; //逆行計次
 			for(int a = 0; a < j.length() ; a++) {
 				jj = new JSONObject(data_Unfinished[a]); 
 
@@ -156,8 +162,8 @@ public class SignatureTest {
 				else inverse_tmp++;
 			}	
 			String[] station_name = new String[station]; //建立存取當前所有出現在動態上的車站數陣列
-			String[] along = new String[along_tmp];	   //建立順行總筆數陣列
-			String[] inverse = new String[inverse_tmp];  //建立逆行總筆數陣列
+			along = new String[along_tmp];	   //建立順行總筆數陣列
+			inverse = new String[inverse_tmp];  //建立逆行總筆數陣列
 			temp = "";
 			temp_2 = "";
 			along_tmp = 0;
@@ -235,7 +241,57 @@ public class SignatureTest {
 	}
 
 	public static void Straight_retrograde_processing(){
-		
+		//data_Unfinished[] api抓到的資料 
+		//along[]順行
+		//inverse[]逆行
+		//Train_time[2][8][每條線的車站數量][] 準備存入API資料的四維陣列  [2]順逆行[8]線數[X]車站量[X]該車站的API資料
+		//int Station_numbers[]記錄每條線的車站數量
+		//string master_station_name[8][] 紀錄每條線的車站名 拿來比對資料是否為該站的資料
+		int Data_along_temp = 0;
+		int Data_inverse_temp = 0;
+		for(int i=0;i<8;i++){
+			for(int j=0;j<Station_numbers[i];j++){
+				JSONObject[] along_Array = new JSONObject[along_tmp];
+				JSONObject[] inverse_Array = new JSONObject[inverse_tmp];
+				for(int API=0;API<along_tmp;API++){
+					along_Array[API] = new JSONObject(along[API]);
+					Object API_DATA = along_Array[API].getJSONObject("StationName").get("Zh_tw");
+					String Api_Data = API_DATA.toString();
+					if(master_station_name[i][j].equals(Api_Data))Data_along_temp++;
+				}
+				Train_time[0][i][j] = new String[Data_along_temp];
+				Data_along_temp=0;
+				for(int API=0;API<along_tmp;API++){
+					along_Array[API] = new JSONObject(along[API]);
+					Object API_DATA = along_Array[API].getJSONObject("StationName").get("Zh_tw");
+					String Api_Data = API_DATA.toString();
+					if(master_station_name[i][j].equals(Api_Data)){
+						Train_time[0][i][j][Data_along_temp] = along[API];
+						Data_along_temp++;
+					}
+				}
+				Data_along_temp = 0;
+				for(int API=0;API<inverse_tmp;API++){
+					inverse_Array[API] = new JSONObject(inverse[API]);
+					Object API_DATA = inverse_Array[API].getJSONObject("StationName").get("Zh_tw");
+					String Api_Data = API_DATA.toString();
+					if(master_station_name[i][j].equals(Api_Data))Data_inverse_temp++;
+				}
+				Train_time[1][i][j] = new String[Data_inverse_temp];
+				Data_inverse_temp = 0;
+				for(int API=0;API<inverse_tmp;API++){
+					inverse_Array[API] = new JSONObject(inverse[API]);
+					Object API_DATA = inverse_Array[API].getJSONObject("StationName").get("Zh_tw");
+					String Api_Data = API_DATA.toString();
+					if(master_station_name[i][j].equals(Api_Data)){
+						Train_time[1][i][j][Data_inverse_temp] = inverse[API];
+						Data_inverse_temp++;
+					}
+				}
+				Data_inverse_temp = 0;
+			}
+		}
+
 	}
 
 	public static String getServerTime() {
