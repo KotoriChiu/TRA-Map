@@ -223,8 +223,8 @@ public class SignatureTest {
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
 				System.out.println(Station_numbers[i]);
-				Train_time[0][i] =new String[Station_numbers[i]][]; 
-				Train_time[1][i] =new String[Station_numbers[i]][]; 
+				Train_time[0][i] =new String[Station_numbers[i]][100]; 
+				Train_time[1][i] =new String[Station_numbers[i]][100]; 
 				//System.out.print(i+" ");
 			}
 			for(String[] i : master_station_name){
@@ -247,51 +247,68 @@ public class SignatureTest {
 		//Train_time[2][8][每條線的車站數量][] 準備存入API資料的四維陣列  [2]順逆行[8]線數[X]車站量[X]該車站的API資料
 		//int Station_numbers[]記錄每條線的車站數量
 		//string master_station_name[8][] 紀錄每條線的車站名 拿來比對資料是否為該站的資料
-		int Data_along_temp = 0;
-		int Data_inverse_temp = 0;
-		for(int i=0;i<8;i++){
-			for(int j=0;j<Station_numbers[i];j++){
-				JSONObject[] along_Array = new JSONObject[along_tmp];
-				JSONObject[] inverse_Array = new JSONObject[inverse_tmp];
-				for(int API=0;API<along_tmp;API++){
-					along_Array[API] = new JSONObject(along[API]);
-					Object API_DATA = along_Array[API].getJSONObject("StationName").get("Zh_tw");
-					String Api_Data = API_DATA.toString();
-					if(master_station_name[i][j].equals(Api_Data))Data_along_temp++;
-				}
-				Train_time[0][i][j] = new String[Data_along_temp];
-				Data_along_temp=0;
-				for(int API=0;API<along_tmp;API++){
-					along_Array[API] = new JSONObject(along[API]);
-					Object API_DATA = along_Array[API].getJSONObject("StationName").get("Zh_tw");
-					String Api_Data = API_DATA.toString();
-					if(master_station_name[i][j].equals(Api_Data)){
-						Train_time[0][i][j][Data_along_temp] = along[API];
-						Data_along_temp++;
+		try{
+			int Data_along_temp = 0;
+			int Data_inverse_temp = 0;
+			for(int i=0;i<8;i++){
+				for(int j=0;j<Station_numbers[i];j++){
+					for(int API=0;API<along.length;API++){
+						JSONObject A_along = new JSONObject(along[API]);
+						Object API_DATA = A_along.getJSONObject("StationName").get("Zh_tw");
+						String Api_Data = API_DATA.toString();
+						if(master_station_name[i][j].equals(Api_Data))Data_along_temp++;
 					}
-				}
-				Data_along_temp = 0;
-				for(int API=0;API<inverse_tmp;API++){
-					inverse_Array[API] = new JSONObject(inverse[API]);
-					Object API_DATA = inverse_Array[API].getJSONObject("StationName").get("Zh_tw");
-					String Api_Data = API_DATA.toString();
-					if(master_station_name[i][j].equals(Api_Data))Data_inverse_temp++;
-				}
-				Train_time[1][i][j] = new String[Data_inverse_temp];
-				Data_inverse_temp = 0;
-				for(int API=0;API<inverse_tmp;API++){
-					inverse_Array[API] = new JSONObject(inverse[API]);
-					Object API_DATA = inverse_Array[API].getJSONObject("StationName").get("Zh_tw");
-					String Api_Data = API_DATA.toString();
-					if(master_station_name[i][j].equals(Api_Data)){
-						Train_time[1][i][j][Data_inverse_temp] = inverse[API];
-						Data_inverse_temp++;
+					Train_time[0][i][j] = new String[Data_along_temp];
+					Data_along_temp=0;
+					for(int API=0;API<along.length;API++){
+						JSONObject A_along = new JSONObject(along[API]);
+						Object API_DATA = A_along.getJSONObject("StationName").get("Zh_tw");
+						String Api_Data = API_DATA.toString();
+						if(master_station_name[i][j].equals(Api_Data)){
+							Train_time[0][i][j][Data_along_temp] = along[API];
+							Data_along_temp++;
+						}
 					}
+					Data_along_temp = 0;
+					for(int API=0;API<inverse.length;API++){
+						JSONObject A_inverse = new JSONObject(inverse[API]);
+						Object API_DATA = A_inverse.getJSONObject("StationName").get("Zh_tw");
+						String Api_Data = API_DATA.toString();
+						if(master_station_name[i][j].equals(Api_Data))Data_inverse_temp++;
+					}
+					Train_time[1][i][j] = new String[Data_inverse_temp];
+					Data_inverse_temp = 0;
+					for(int API=0;API<inverse.length;API++){
+						JSONObject A_inverse = new JSONObject(inverse[API]);
+						Object API_DATA = A_inverse.getJSONObject("StationName").get("Zh_tw");
+						String Api_Data = API_DATA.toString();
+						if(master_station_name[i][j].equals(Api_Data)){
+							Train_time[1][i][j][Data_inverse_temp] = inverse[API];
+							Data_inverse_temp++;
+						}
+					}
+					Data_inverse_temp = 0;
 				}
-				Data_inverse_temp = 0;
+				
+				
 			}
+			int tempa = 0;
+			
+				for(String b[][]:Train_time[1]){
+					for(String c[]:b){
+						for(String d:c){
+							if(d!=null){
+								//System.out.println(d);
+								tempa++;
+							}
+						}
+					}
+				}
+			
+			System.out.println(tempa+" "+inverse.length);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-
 	}
 
 	public static String getServerTime() {
