@@ -34,7 +34,7 @@ public class SignatureTest {
 	static JSONObject jj;
 	static JSONArray station_data;
 	static String line, response="";
-	static String[][][][] Train_time = new String[2][8][][];
+	static String[][][][] Train_time = new String[2][8][172][100];
 	static String[][] master_station_name = new String[8][172];
 	static String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
 	static int[] Station_numbers = {0,0,0,0,0,0,0,0};
@@ -259,7 +259,7 @@ public class SignatureTest {
 						if(master_station_name[i][j].equals(Api_Data))Data_along_temp++;
 					}
 					Train_time[0][i][j] = new String[Data_along_temp];
-					Data_along_temp=0;
+					Data_along_temp = 0;
 					for(int API=0;API<along.length;API++){
 						JSONObject A_along = new JSONObject(along[API]);
 						Object API_DATA = A_along.getJSONObject("StationName").get("Zh_tw");
@@ -293,7 +293,7 @@ public class SignatureTest {
 				
 			}
 			int tempa = 0;
-			
+			System.out.println(Train_time[0][0][0][0]);
 				for(String b[][]:Train_time[1]){
 					for(String c[]:b){
 						for(String d:c){
@@ -305,7 +305,7 @@ public class SignatureTest {
 					}
 				}
 			
-			System.out.println(tempa+" "+inverse.length);
+			System.out.println(tempa+" "+inverse.length);//驗證資料數 (已解決)
 		}catch(Exception e){
 			e.printStackTrace();
 		}
