@@ -43,20 +43,19 @@ public class SignatureTest {
 	static int along_tmp , inverse_tmp; 
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
-			  	start_readAPI(); //取得API資料
-			  	//System.out.println(response);
+			  	start_readAPI(); 						//取得API資料
 			  	try {
-				  	start_arrange_dada();
-				  	data_detail_process();
-					liveboard_data();
-					System.out.println("Using Time:" + (System.currentTimeMillis() - startTime) + " ms");
-					Straight_retrograde_processing();
+				  	start_arrange_dada();				//處理抓到的API資料
+				  	data_detail_process();				//依照順行逆行將資料分開整理
+					liveboard_data();					//讀取本地資中的車站資訊
+					Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
+					System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + " 秒");
 			  	} catch(Exception e) {
 				  	System.out.println("error: "+e.getMessage());
 				  	e.printStackTrace();
 			  	}  		  
 	}
-	//讀取API
+
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String[] APP_Url_Id_Key = new String[3];      
@@ -67,7 +66,6 @@ public class SignatureTest {
 		String Signature="";
 		File file = new File("API_key");
 		try {
-			
 			if(!file.exists()){ //判斷密鑰檔是否存在
 				FileWriter fw = new FileWriter("API_key");
 				for(int i = 0;i < 3;i++)fw.write(txtdata[i]+"\n"); //寫入預設密鑰檔內容
@@ -123,7 +121,7 @@ public class SignatureTest {
 				e.printStackTrace();
 			}
 	}
-	//處理抓到的資料
+
 	public static void start_arrange_dada() {
 		try{
 			j = new JSONArray(response);
@@ -151,7 +149,6 @@ public class SignatureTest {
 			inverse_tmp = 0; //逆行計次
 			for(int a = 0; a < j.length() ; a++) {
 				jj = new JSONObject(data_Unfinished[a]); 
-
 				Object jsonOb = jj.getJSONObject("StationName").get("Zh_tw"); //抓取車站資料(測試用)
 				temp = jsonOb.toString();
 				if(a != 0 && !temp.equals(temp_2)) station++; //計算過濾同車站多筆資料
@@ -194,9 +191,8 @@ public class SignatureTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void liveboard_data(){
-		
 		JSONObject[] Station_DataJSON = new JSONObject[8];
 		Object[] jsonSD = new Object[8];
 		JSONArray[] SDA = new JSONArray[8];
@@ -219,13 +215,11 @@ public class SignatureTest {
 					master_station_name[a][i] = jsonSD[a].toString();
 				}
 			}
-			
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
 				System.out.println(Station_numbers[i]);
 				Train_time[0][i] =new String[Station_numbers[i]][100]; 
 				Train_time[1][i] =new String[Station_numbers[i]][100]; 
-				//System.out.print(i+" ");
 			}
 			for(String[] i : master_station_name){
 				for(String j : i){
@@ -234,7 +228,6 @@ public class SignatureTest {
 				}
 				System.out.println();
 			}
-			//System.out.println(master_station_name[0][1]);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -258,7 +251,7 @@ public class SignatureTest {
 						String Api_Data = API_DATA.toString();
 						if(master_station_name[i][j].equals(Api_Data))Data_along_temp++;
 					}
-					Train_time[0][i][j] = new String[Data_along_temp];
+					if(Data_along_temp!=0)Train_time[0][i][j] = new String[Data_along_temp];
 					Data_along_temp = 0;
 					for(int API=0;API<along.length;API++){
 						JSONObject A_along = new JSONObject(along[API]);
@@ -276,7 +269,7 @@ public class SignatureTest {
 						String Api_Data = API_DATA.toString();
 						if(master_station_name[i][j].equals(Api_Data))Data_inverse_temp++;
 					}
-					Train_time[1][i][j] = new String[Data_inverse_temp];
+					if(Data_inverse_temp!=0)Train_time[1][i][j] = new String[Data_inverse_temp];
 					Data_inverse_temp = 0;
 					for(int API=0;API<inverse.length;API++){
 						JSONObject A_inverse = new JSONObject(inverse[API]);
@@ -288,24 +281,8 @@ public class SignatureTest {
 						}
 					}
 					Data_inverse_temp = 0;
-				}
-				
-				
+				}	
 			}
-			int tempa = 0;
-			System.out.println(Train_time[0][0][0][0]);
-				for(String b[][]:Train_time[1]){
-					for(String c[]:b){
-						for(String d:c){
-							if(d!=null){
-								//System.out.println(d);
-								tempa++;
-							}
-						}
-					}
-				}
-			
-			System.out.println(tempa+" "+inverse.length);//驗證資料數 (已解決)
 		}catch(Exception e){
 			e.printStackTrace();
 		}
