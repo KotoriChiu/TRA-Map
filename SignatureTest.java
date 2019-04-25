@@ -37,6 +37,7 @@ public class SignatureTest {
 	static String[][][][] Train_time = new String[2][8][172][100];
 	static String[][] master_station_name = new String[8][172];
 	static String[] Station_txt = {"./Station_Data/南北回主線","./Station_Data/宜蘭支線","./Station_Data/山線","./Station_Data/成追線","./Station_Data/沙崙支線","./Station_Data/海線","./Station_Data/深澳平溪線","./Station_Data/縱貫線"};
+	static String[] Station_route = {"南北回主線","宜蘭支線","山線","成追線","沙崙支線","海線","深澳平溪線","縱貫線"};
 	static int[] Station_numbers = {0,0,0,0,0,0,0,0};
 	static String[] along;
 	static String[] inverse;
@@ -49,7 +50,7 @@ public class SignatureTest {
 				  	data_detail_process();				//依照順行逆行將資料分開整理
 					liveboard_data();					//讀取本地資中的車站資訊
 					Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
-					System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + " 秒");
+					System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + "秒");
 			  	} catch(Exception e) {
 				  	System.out.println("error: "+e.getMessage());
 				  	e.printStackTrace();
@@ -78,6 +79,10 @@ public class SignatureTest {
 			BufferedReader API_key = new BufferedReader(fr); //更新寫法 用文字檔讀取Url ID Key
 			for(int i = 0;i<APP_Url_Id_Key.length;i++) APP_Url_Id_Key[i] = API_key.readLine();
 			fr.close();
+			if(!(APP_Url_Id_Key[1].matches("[a-z0-9]{32}") && APP_Url_Id_Key[2].matches("\\w{27}"))){
+				System.out.println("您輸入的密鑰格式似乎不太正確 請確認您的密鑰!!");
+				System.exit(1);
+			}//71a1de694a034562a7356e8dce5c5791 
 			Signature = HMAC_SHA1.Signature(SignDate, APP_Url_Id_Key[2]);
 		} catch (SignatureException e1) {
 			e1.printStackTrace();
@@ -283,6 +288,39 @@ public class SignatureTest {
 					Data_inverse_temp = 0;
 				}	
 			}
+			//輸出格式 XX站 車次 車種 到站時間 駛離時間 終點: 準點與否:
+			File dataTXT = new File("dataTXT.txt");
+			dataTXT.createNewFile();
+			FileWriter fw = new FileWriter("dataTXT.txt");
+			int ii = 0;
+			int oo = 0;
+			for(String a[][][] : Train_time){
+				fw.write("順行逆行分隔\n");
+				for(String b[][] : a){
+					fw.write("路線分隔\n");
+					for(String c[] : b){
+						for(String d : c){
+							if(d!=null){
+								System.out.println(d);
+								JSONObject write_txt = new JSONObject(d);
+								Object[] Station_inif = new Object[7];
+								String[] Station_inif_Str = new String[7];
+								Station_inif[0] = write_txt.getJSONObject("StationName").get("Zh_tw");
+								Station_inif[1] = write_txt.get("StationID");
+								Station_inif[2] = write_txt.getJSONObject("TrainTypeName").get("Zh_tw");
+								Station_inif[3] = write_txt.get("ScheduledArrivalTime");
+								Station_inif[4] = write_txt.get("ScheduledDepartureTime");
+								Station_inif[5] = write_txt.getJSONObject("EndingStationName").get("Zh_tw");
+								Station_inif[6] = write_txt.get("DelayTime");
+								for(int i = 0;i<Station_inif.length;i++)Station_inif_Str[i] = Station_inif[i].toString();
+								fw.write("當前車站名稱:"+Station_inif_Str[0]+"站 車次:"+Station_inif_Str[1]+"次 車種:"+Station_inif_Str[2]+" 預定到站時間:"+Station_inif_Str[3]+" 預定駛離時間:"+Station_inif_Str[4]+" 本列車終點:"+Station_inif_Str[5]+"站 誤點與否:"+(Station_inif_Str[6].equals("0")?"準點":("誤點"+Station_inif_Str[6]+"分"))+"\n");
+							}
+						}
+					}
+				}
+			}
+			fw.flush();
+			fw.close();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
