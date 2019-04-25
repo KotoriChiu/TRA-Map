@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.IllegalFormatWidthException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 import com.google.gson.Gson;
@@ -60,20 +61,34 @@ public class SignatureTest {
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String[] APP_Url_Id_Key = new String[3];      
-		String[] txtdata = {"http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON","XXXXXXXXXXXXXXXXX  APPID","XXXXXXXXXXXXXXXXX  APPKey"};
+		String txtdata = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
         System.setProperty("file.encoding", "UTF-8");
         String xdate = getServerTime();
         String SignDate = "x-date: " + xdate;        
 		String Signature="";
 		File file = new File("API_key");
+		Scanner user_input = new Scanner(System.in);
 		try {
 			if(!file.exists()){ //判斷密鑰檔是否存在
 				FileWriter fw = new FileWriter("API_key");
-				for(int i = 0;i < 3;i++)fw.write(txtdata[i]+"\n"); //寫入預設密鑰檔內容
+				fw.write(txtdata+"\n"); //寫入預設密鑰檔內容
+				while(true){
+					System.out.print("請輸入APPID:");
+					String APPID = user_input.next();
+					System.out.print("請輸入APPKey:");
+					String APPKey = user_input.next();
+					if(APPID.matches("[a-z0-9]{32}") && APPKey.matches("\\w{27}")){
+						fw.write(APPID+"\n");
+						fw.write(APPKey+"\n");
+						System.out.println("金鑰設定完畢!");
+						break;
+					}else System.out.println("金鑰格式輸入錯誤! 請確認您的金鑰!!");
+				}
 				fw.flush();
 				fw.close();
-				System.out.println("文件檔\"API_key\"已新增,請至目錄下設定AppID AppKey!!!");
-				System.exit(0); //當密鑰文件檔未創立 自動創立完 且停止程式執行
+
+				//System.out.println("文件檔\"API_key\"已新增,請至目錄下設定AppID AppKey!!!");
+				//System.exit(0); //當密鑰文件檔未創立 自動創立完 且停止程式執行
 			}
 			FileReader fr = new FileReader("API_key");
 			BufferedReader API_key = new BufferedReader(fr); //更新寫法 用文字檔讀取Url ID Key
