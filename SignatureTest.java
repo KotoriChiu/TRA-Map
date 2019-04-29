@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.zip.GZIPInputStream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -45,13 +48,28 @@ public class SignatureTest {
 	static int along_tmp , inverse_tmp; 
 	public static void main(String[] args) {
 				long startTime = System.currentTimeMillis();
-			  	start_readAPI(); 						//取得API資料
-			  	try {
-				  	start_arrange_dada();				//處理抓到的API資料
-				  	data_detail_process();				//依照順行逆行將資料分開整理
-					liveboard_data();					//讀取本地資中的車站資訊
-					Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
-					System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + "秒");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				
+				try {
+					int run = 0;
+					while(true){
+						
+						while(run==0){
+							run = 60;
+							System.out.println("重整資料時間:"+sdf.format(new Date()));
+							start_readAPI(); 						//取得API資料
+							start_arrange_dada();				//處理抓到的API資料
+							data_detail_process();				//依照順行逆行將資料分開整理
+							liveboard_data();					//讀取本地資中的車站資訊
+							Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
+							System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + "秒");
+						}
+						Thread.sleep(1000); //设置暂停的时间 5 秒
+						run--;
+						System.out.println(run+"\n\r");
+					}
+					
+						
 			  	} catch(Exception e) {
 				  	System.out.println("error: "+e.getMessage());
 				  	e.printStackTrace();
@@ -150,7 +168,7 @@ public class SignatureTest {
 			
 			for (int a=0; a < j.length(); a++) { //整理JSON
 				data_Unfinished[a] = String.valueOf(j.get(a));
-		    	System.out.println(data_Unfinished[a] + "\n");
+		    	//System.out.println(data_Unfinished[a] + "\n");
 				fw.write(data_Unfinished[a] + "\n");
 			}
 				fw.flush(); 
@@ -205,7 +223,7 @@ public class SignatureTest {
 				}
 			}
 			station_name[station - 1] = temp_2;
-			for(int a = 0; a < station; a++) System.out.print(station_name[a] + a + " ");
+			//for(int a = 0; a < station; a++) System.out.print(station_name[a] + a + " ");
 			System.out.println("順行資料共有:" + along_tmp + "筆 逆行資料共有:" + inverse_tmp + "筆");
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -237,17 +255,17 @@ public class SignatureTest {
 			}
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
-				System.out.println(Station_numbers[i]);
+				//System.out.println(Station_numbers[i]);
 				Train_time[0][i] =new String[Station_numbers[i]][100]; 
 				Train_time[1][i] =new String[Station_numbers[i]][100]; 
 			}
-			for(String[] i : master_station_name){
+			/*for(String[] i : master_station_name){
 				for(String j : i){
 					if(j != null)System.out.print(j+" ");
 					else break;
 				}
 				System.out.println();
-			}
+			}*/
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -307,9 +325,34 @@ public class SignatureTest {
 			File dataTXT = new File("dataTXT.txt");
 			dataTXT.createNewFile();
 			FileWriter fw = new FileWriter("dataTXT.txt");
-			int ii = 0;
-			int oo = 0;
-			for(String a[][][] : Train_time){
+			
+			//修改成一般for迴圈
+			for(int i=0;i<Train_time.length;i++){
+				fw.write(i==0?"順行資料\n":"逆行資料\n");
+				for(int j=0;j<Train_time[i].length;j++){
+					fw.write(Station_route[j]+"\n");
+					for(int k=0;k<Train_time[i][j].length;k++){
+						for(int l=0;l<Train_time[i][j][k].length;l++){
+							if(Train_time[i][j][k][l]!=null){
+								//System.out.println(Train_time[i][j][k][l]);
+								JSONObject write_txt = new JSONObject(Train_time[i][j][k][l]);
+								Object[] Station_inif = new Object[7];
+								String[] Station_inif_Str = new String[7];
+								Station_inif[0] = write_txt.getJSONObject("StationName").get("Zh_tw");
+								Station_inif[1] = write_txt.get("StationID");
+								Station_inif[2] = write_txt.getJSONObject("TrainTypeName").get("Zh_tw");
+								Station_inif[3] = write_txt.get("ScheduledArrivalTime");
+								Station_inif[4] = write_txt.get("ScheduledDepartureTime");
+								Station_inif[5] = write_txt.getJSONObject("EndingStationName").get("Zh_tw");
+								Station_inif[6] = write_txt.get("DelayTime");
+								for(int ii = 0;ii<Station_inif.length;ii++)Station_inif_Str[ii] = Station_inif[ii].toString();
+								fw.write("當前車站名稱:"+Station_inif_Str[0]+"站 車次:"+Station_inif_Str[1]+"次 車種:"+Station_inif_Str[2]+" 預定到站時間:"+Station_inif_Str[3]+" 預定駛離時間:"+Station_inif_Str[4]+" 本列車終點:"+Station_inif_Str[5]+"站 誤點與否:"+(Station_inif_Str[6].equals("0")?"準點":("誤點"+Station_inif_Str[6]+"分"))+"\n");
+							}
+						}
+					}
+				}
+			}
+			/*for(String a[][][] : Train_time){
 				fw.write("順行逆行分隔\n");
 				for(String b[][] : a){
 					fw.write("路線分隔\n");
@@ -333,7 +376,7 @@ public class SignatureTest {
 						}
 					}
 				}
-			}
+			}*/
 			fw.flush();
 			fw.close();
 		}catch(Exception e){
