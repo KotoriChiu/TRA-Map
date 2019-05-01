@@ -1,42 +1,30 @@
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.SignatureException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.IllegalFormatWidthException;
-import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.zip.GZIPInputStream;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.json.*;
 
 // javac -encoding utf-8 SignatureTest.java && java -Dfile.encoding=utf-8 SignatureTest
 
 public class SignatureTest {
 	static String[] data_Unfinished;
-	static JSONArray j;
+	static JSONArray j , station_data;
 	static JSONObject jj;
-	static JSONArray station_data;
 	static String line, response="";
 	static String[][][][] Train_time = new String[2][8][172][100];
 	static String[][] master_station_name = new String[8][172];
@@ -47,42 +35,38 @@ public class SignatureTest {
 	static String[] inverse;
 	static int along_tmp , inverse_tmp; 
 	public static void main(String[] args) {
-				long startTime = System.currentTimeMillis();
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				
-				try {
-					int run = 0;
-					while(true){
-						
-						while(run==0){
-							run = 60;
-							System.out.println("重整資料時間:"+sdf.format(new Date()));
-							start_readAPI(); 						//取得API資料
-							start_arrange_dada();				//處理抓到的API資料
-							data_detail_process();				//依照順行逆行將資料分開整理
-							liveboard_data();					//讀取本地資中的車站資訊
-							Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
-							System.out.println("資料抓取與處理共花了:" + (System.currentTimeMillis() - startTime)/1000.0 + "秒");
-						}
-						Thread.sleep(1000); //设置暂停的时间 5 秒
-						run--;
-						System.out.println(run+"\n\r");
-					}
-					
-						
-			  	} catch(Exception e) {
-				  	System.out.println("error: "+e.getMessage());
-				  	e.printStackTrace();
-			  	}  		  
+		long startTime = System.currentTimeMillis();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			int run = 0;
+			while(true){
+				while(run==0){
+					run = 60;
+					System.out.println("重整資料時間:"+sdf.format(new Date()));
+					start_readAPI(); 						//取得API資料
+					start_arrange_dada();				//處理抓到的API資料
+					data_detail_process();				//依照順行逆行將資料分開整理
+					liveboard_data();					//讀取本地資中的車站資訊
+					Straight_retrograde_processing();	//將先前整理好的順逆行資料 分別存在對應的車站陣列中
+				}
+				Train_time = new String[2][8][172][100];
+				master_station_name = new String[8][172];
+				for(int i = 0;i<Station_numbers.length;i++)Station_numbers[i]=0;
+				Thread.sleep(1000); //设置暂停的时间 5 秒
+				run--;
+				System.out.println(run+"\n\r");
+			}			
+		} catch(Exception e) {
+			System.out.println("error: "+e.getMessage());
+			e.printStackTrace();
+		}  		  
 	}
 
 	public static void start_readAPI() {
 		HttpURLConnection connection = null;
 		String[] APP_Url_Id_Key = new String[3];      
-		String txtdata = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON";
-        System.setProperty("file.encoding", "UTF-8");
-        String xdate = getServerTime();
-        String SignDate = "x-date: " + xdate;        
+		String txtdata = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/LiveBoard?$format=JSON",xdate = getServerTime(),SignDate = "x-date: " + xdate;
+        System.setProperty("file.encoding", "UTF-8");   
 		String Signature="";
 		File file = new File("API_key");
 		Scanner user_input = new Scanner(System.in);
@@ -104,9 +88,6 @@ public class SignatureTest {
 				}
 				fw.flush();
 				fw.close();
-
-				//System.out.println("文件檔\"API_key\"已新增,請至目錄下設定AppID AppKey!!!");
-				//System.exit(0); //當密鑰文件檔未創立 自動創立完 且停止程式執行
 			}
 			FileReader fr = new FileReader("API_key");
 			BufferedReader API_key = new BufferedReader(fr); //更新寫法 用文字檔讀取Url ID Key
@@ -115,17 +96,14 @@ public class SignatureTest {
 			if(!(APP_Url_Id_Key[1].matches("[a-z0-9]{32}") && APP_Url_Id_Key[2].matches("\\w{27}"))){
 				System.out.println("您輸入的密鑰格式似乎不太正確 請確認您的密鑰!!");
 				System.exit(1);
-			}//71a1de694a034562a7356e8dce5c5791 
+			}
 			Signature = HMAC_SHA1.Signature(SignDate, APP_Url_Id_Key[2]);
 		} catch (SignatureException e1) {
 			e1.printStackTrace();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
-		//System.out.println("Signature :" + Signature);
         String sAuth = "hmac username=\"" + APP_Url_Id_Key[1] + "\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"" + Signature + "\"";
-        //System.out.println(sAuth);
 		   try{  
 		      URL url=new URL(APP_Url_Id_Key[0]);
 		      connection=(HttpURLConnection)url.openConnection();
@@ -135,23 +113,17 @@ public class SignatureTest {
 		      connection.setRequestProperty("Accept-Encoding", "gzip");
 		      connection.setDoInput(true);
 		      connection.setDoOutput(true);
-		      
-		      
 		      InputStream inputStream = connection.getInputStream();
 	          ByteArrayOutputStream bao = new ByteArrayOutputStream();
 		      byte[] buff = new byte[1024];
 	          int bytesRead = 0;
 			  while((bytesRead = inputStream.read(buff)) != -1) bao.write(buff, 0, bytesRead);
-			  
 		      ByteArrayInputStream bais = new ByteArrayInputStream(bao.toByteArray());
 		      GZIPInputStream gzis = new GZIPInputStream(bais);
 		      InputStreamReader reader = new InputStreamReader(gzis);
-		      BufferedReader in = new BufferedReader(reader);
+			  BufferedReader in = new BufferedReader(reader);
+			  response="";
 			  while ((line = in.readLine()) != null) response+=(line+"\n");
-			  
-		      Type RailStationListType = new TypeToken<ArrayList<RailStation>>(){}.getType();
-		      Gson gsonReceiver = new Gson();
-		      List<RailStation> obj = gsonReceiver.fromJson(response, RailStationListType);
 			}catch(ProtocolException e) {
 				e.printStackTrace();
 			}
@@ -165,15 +137,13 @@ public class SignatureTest {
 			j = new JSONArray(response);
 			data_Unfinished = new String[j.length()];
 			FileWriter fw = new FileWriter("output");
-			
 			for (int a=0; a < j.length(); a++) { //整理JSON
 				data_Unfinished[a] = String.valueOf(j.get(a));
-		    	//System.out.println(data_Unfinished[a] + "\n");
 				fw.write(data_Unfinished[a] + "\n");
 			}
-				fw.flush(); 
-				fw.close();
-				System.out.println("共抓到" + j.length() + "筆資料");
+			fw.flush(); 
+			fw.close();
+			System.out.println("共抓到" + j.length() + "筆資料");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -191,7 +161,6 @@ public class SignatureTest {
 				temp = jsonOb.toString();
 				if(a != 0 && !temp.equals(temp_2)) station++; //計算過濾同車站多筆資料
 				temp_2 = jsonOb.toString();
-
 				Object direction = jj.get("Direction"); //抓取順逆行資料
 				if(direction.toString().equals("0")) along_tmp++;
 				else inverse_tmp++;
@@ -203,7 +172,6 @@ public class SignatureTest {
 			temp_2 = "";
 			along_tmp = 0;
 			inverse_tmp = 0; 
-
 			for(int a = 0; a < j.length(); a++) {
 				jj = new JSONObject(data_Unfinished[a]);
 				Object jsonob = jj.getJSONObject("StationName").get("Zh_tw"); 
@@ -223,7 +191,6 @@ public class SignatureTest {
 				}
 			}
 			station_name[station - 1] = temp_2;
-			//for(int a = 0; a < station; a++) System.out.print(station_name[a] + a + " ");
 			System.out.println("順行資料共有:" + along_tmp + "筆 逆行資料共有:" + inverse_tmp + "筆");
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -255,17 +222,9 @@ public class SignatureTest {
 			}
 			for(int i = 0;i < master_station_name.length;i++){
 				for(int j = 0;j<master_station_name[0].length;j++)if(master_station_name[i][j] != null)Station_numbers[i]++;
-				//System.out.println(Station_numbers[i]);
 				Train_time[0][i] =new String[Station_numbers[i]][100]; 
 				Train_time[1][i] =new String[Station_numbers[i]][100]; 
 			}
-			/*for(String[] i : master_station_name){
-				for(String j : i){
-					if(j != null)System.out.print(j+" ");
-					else break;
-				}
-				System.out.println();
-			}*/
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -325,8 +284,6 @@ public class SignatureTest {
 			File dataTXT = new File("dataTXT.txt");
 			dataTXT.createNewFile();
 			FileWriter fw = new FileWriter("dataTXT.txt");
-			
-			//修改成一般for迴圈
 			for(int i=0;i<Train_time.length;i++){
 				fw.write(i==0?"順行資料\n":"逆行資料\n");
 				for(int j=0;j<Train_time[i].length;j++){
@@ -334,12 +291,12 @@ public class SignatureTest {
 					for(int k=0;k<Train_time[i][j].length;k++){
 						for(int l=0;l<Train_time[i][j][k].length;l++){
 							if(Train_time[i][j][k][l]!=null){
-								//System.out.println(Train_time[i][j][k][l]);
 								JSONObject write_txt = new JSONObject(Train_time[i][j][k][l]);
 								Object[] Station_inif = new Object[7];
 								String[] Station_inif_Str = new String[7];
+								//抓取JSON各個資料 StationName:當前車站名 TrainNo:車次 TrainTypeName:車種 ScheduledArrivalTime:預計到站時間 ScheduledDepartureTime:預計開車時間 DelayTime:誤點時間 (準點為0)
 								Station_inif[0] = write_txt.getJSONObject("StationName").get("Zh_tw");
-								Station_inif[1] = write_txt.get("StationID");
+								Station_inif[1] = write_txt.get("TrainNo");
 								Station_inif[2] = write_txt.getJSONObject("TrainTypeName").get("Zh_tw");
 								Station_inif[3] = write_txt.get("ScheduledArrivalTime");
 								Station_inif[4] = write_txt.get("ScheduledDepartureTime");
@@ -352,31 +309,6 @@ public class SignatureTest {
 					}
 				}
 			}
-			/*for(String a[][][] : Train_time){
-				fw.write("順行逆行分隔\n");
-				for(String b[][] : a){
-					fw.write("路線分隔\n");
-					for(String c[] : b){
-						for(String d : c){
-							if(d!=null){
-								System.out.println(d);
-								JSONObject write_txt = new JSONObject(d);
-								Object[] Station_inif = new Object[7];
-								String[] Station_inif_Str = new String[7];
-								Station_inif[0] = write_txt.getJSONObject("StationName").get("Zh_tw");
-								Station_inif[1] = write_txt.get("StationID");
-								Station_inif[2] = write_txt.getJSONObject("TrainTypeName").get("Zh_tw");
-								Station_inif[3] = write_txt.get("ScheduledArrivalTime");
-								Station_inif[4] = write_txt.get("ScheduledDepartureTime");
-								Station_inif[5] = write_txt.getJSONObject("EndingStationName").get("Zh_tw");
-								Station_inif[6] = write_txt.get("DelayTime");
-								for(int i = 0;i<Station_inif.length;i++)Station_inif_Str[i] = Station_inif[i].toString();
-								fw.write("當前車站名稱:"+Station_inif_Str[0]+"站 車次:"+Station_inif_Str[1]+"次 車種:"+Station_inif_Str[2]+" 預定到站時間:"+Station_inif_Str[3]+" 預定駛離時間:"+Station_inif_Str[4]+" 本列車終點:"+Station_inif_Str[5]+"站 誤點與否:"+(Station_inif_Str[6].equals("0")?"準點":("誤點"+Station_inif_Str[6]+"分"))+"\n");
-							}
-						}
-					}
-				}
-			}*/
 			fw.flush();
 			fw.close();
 		}catch(Exception e){
